@@ -10,12 +10,12 @@ const jwtDecode = require('jwt-decode');
 const loginClient = async (req,res) => {
     try {
         var data = JSON.stringify({
-            "successUrl": `http://localhost:${process.env.PORT || 4000}/GRUPO-J/success`,
+            "successUrl": `http://localhost:${process.env.PORT || 4000}/GRUPO-J/success`,            //LOGIN de usuario
             "failedUrl": `http://localhost:${process.env.PORT || 4000}/GRUPO-J/failed`
           });
           
           var config = {
-            method: 'post',
+            method: 'post',                                                                   //Obtener token con los datos entregados por el profesor
             url: 'https://api.sebastian.cl/UtemAuth/v1/tokens/request',
             headers: { 
               'X-API-TOKEN': 'CPYD-J-202201', 
@@ -52,24 +52,24 @@ const EnterOutput = async (req,res) => {
       const userToken = req.headers['jwt'];
       let payload = {};
       payload = jwtDecode(userToken);
-      var queryEstudiante = await db.query('SELECT * FROM estudent where email=$1',[payload.email])
+      var queryEstudiante = await db.query('SELECT * FROM estudent where email=$1',[payload.email])     // de la tabla estudiantes toma el email
       if (queryEstudiante['rows'].length > 0) {
-        var querySeccion = await db.query('SELECT * FROM section where nombre=$1',[req.body.subject]);
+        var querySeccion = await db.query('SELECT * FROM section where nombre=$1',[req.body.subject]);     // de la tabla section toma nombre de la seccion
         if (querySeccion['rows'].length > 0) {
-          var queryCurso = await db.query('SELECT * FROM course where id_estudent=$1 AND id_section=$2',[queryEstudiante['rows'][0]['id'],querySeccion['rows'][0]['id']])
+          var queryCurso = await db.query('SELECT * FROM course where id_estudent=$1 AND id_section=$2',[queryEstudiante['rows'][0]['id'],querySeccion['rows'][0]['id']])   
           if (queryCurso['rows'].length > 0) {
-            var queryEntrada = await db.query('SELECT * FROM assistance where email=$1 AND entrada=$2 AND section=$3 AND sala=$4',[payload.email,req.body.entrance,req.body.subject,req.body.classroom]);
+            var queryEntrada = await db.query('SELECT * FROM assistance where email=$1 AND entrada=$2 AND section=$3 AND sala=$4',[payload.email,req.body.entrance,req.body.subject,req.body.classroom]); //toma todos los datos para la tabla assistance
 
             if (queryEntrada['rows'].length > 0) {
-              await db.query('UPDATE assistance SET salida=$1 WHERE id=$2',[req.body.leaving,queryEntrada['rows'][0]['id']]);
+              await db.query('UPDATE assistance SET salida=$1 WHERE id=$2',[req.body.leaving,queryEntrada['rows'][0]['id']]); //actualiza la tabla
               res.status(200).json({
-                "classroom" : req.body.classroom,
+                "classroom" : req.body.classroom,                                 //Responde en formato json si cumple con todo lo anterior con la entrada y salida
                 "subject" : req.body.subject,
                 "entrance" : req.body.entrance,
                 "leaving" : req.body.leaving
               });
             } else {
-              res.status(400).json('Usted no hizo ingreso a la sala en la fecha indicada');
+              res.status(400).json('Usted no hizo ingreso a la sala en la fecha indicada');   //Si no, el servidor responde con mensajes de error
             }
             
           } else {
@@ -95,7 +95,7 @@ const EnterAssistance = async (req,res) => {
       const userToken = req.headers['jwt'];
       let payload = {};
       payload = jwtDecode(userToken);
-      var queryEstudiante = await db.query('SELECT * FROM estudent where email=$1',[payload.email])
+      var queryEstudiante = await db.query('SELECT * FROM estudent where email=$1',[payload.email])               //Practicamente hace lo mismo que la funcion anterior exceptuando los datos del json       
       if (queryEstudiante['rows'].length > 0) {
         var querySeccion = await db.query('SELECT * FROM section where nombre=$1',[req.body.subject]);
         if (querySeccion['rows'].length > 0) {
@@ -104,12 +104,12 @@ const EnterAssistance = async (req,res) => {
            await db.query('INSERT INTO assistance(email,sala,section,entrada) VALUES($1,$2,$3,$4)',[payload.email,req.body.classroom,req.body.subject,req.body.entrance]);
             res.status(200).json({
               "classroom" : req.body.classroom,
-              "subject" : req.body.subject,
+              "subject" : req.body.subject,                   //MArca la entrada del estudiante y su respectivo mail
               "entrance" : req.body.entrance,
               "email" : payload.email
             });
           } else {
-            res.status(400).json('No existe este estudiante en esta sección');
+            res.status(400).json('No existe este estudiante en esta sección');   //MEnsajes de error
           }
         } else {
           res.status(400).json('No existe la sección');
