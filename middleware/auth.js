@@ -1,4 +1,3 @@
-//const jwt = require('jwt-simple');
 const moment = require('moment');
 const jwtDecode = require('jwt-decode');
 const checkToken = (req, res, next) => {

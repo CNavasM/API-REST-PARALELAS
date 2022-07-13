@@ -1,8 +1,5 @@
 const axios = require('axios');
 const {db} = require('./bdConnection');
-//const moment = require('moment');
-//const jwt = require('jwt-simple');
-//var fs = require('fs');
 const jwtDecode = require('jwt-decode');
 
 // Una funcion async va a esperar que pase todos los pasos internos para poder dar una respuesta
