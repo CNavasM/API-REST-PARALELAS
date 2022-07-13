@@ -17,7 +17,7 @@ async function InitDataBase(){ //inicia la base de datos
         var respuesta = await db.query(queryEstudiante,['Camilo'])
         var respuesta2 = await db.query(queryEstudiante,['Sebastian'])
         var respuesta3 = await db.query('select exists(select 1 from section where nombre=$1)',['INFB8090'])
-        var respuesta4 = await db.query('select exists(select 1 from course where id_section=$1 AND id_estudent=$2)',[1,1])
+        var respuesta4 = await db.query('select exists(select 1 from course where id_section=$1 AND id_estudent=$2)',[1,2])
         if(respuesta['rows'][0]['exists'] === false){ // dentro de la base de datos en respuestas nos dirigimos a lo que es columna, 0 indicando el primer valor y si existe o no
             await db.query(queryCrear,['camilo.navasm@utem.cl','Camilo'])           //Pruebas de Estudiante Camilo Navas para el llamado a la Base de datos
         }
